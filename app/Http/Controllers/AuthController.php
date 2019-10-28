@@ -41,7 +41,7 @@ class AuthController extends ApiController
                 'file' => $exception->getFile(),
             ]);
 
-            return $this->respondWithError("Registering User Encountered an Unexpected Error", 409);
+            return $this->respondWithError("Registering user encountered an Unexpected Error", 409);
         }
     }
 

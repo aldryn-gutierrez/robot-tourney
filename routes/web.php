@@ -22,4 +22,9 @@ $router->group(['prefix' => 'api'], function () use ($router) {
     $router->group(['prefix' => 'user', 'middleware' => 'auth'], function () use ($router) {
         $router->get('/', 'UserController@index');
     });
+
+    $router->group(['prefix' => 'robot', 'middleware' => 'auth'], function () use ($router) {
+        $router->get('/', 'RobotController@index');
+        $router->post('/', 'RobotController@store');
+    });
 });
