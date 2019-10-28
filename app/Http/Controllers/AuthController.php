@@ -7,7 +7,7 @@ use  App\Models\User;
 
 use Illuminate\Support\Facades\Auth;
 
-class AuthController extends Controller
+class AuthController extends ApiController
 {
     /**
      * Store a new user.

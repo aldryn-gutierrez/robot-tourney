@@ -2,28 +2,67 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use  App\Models\User;
+use  App\Repositories\UserRepository;
 
-class UserController extends Controller
+class UserController extends ApiController
 {
-     /**
-     * Instantiate a new UserController instance.
+    /**
+     * Display a listing of the resource.
      *
-     * @return void
+     * @param  \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\Response
      */
-    public function __construct()
+    public function index(Request $request, UserRepository $userRepository)
     {
-        $this->middleware('auth');
+        return response()->json(['users' =>  $userRepository->get()], 200);   
     }
 
     /**
-     * Get all User.
+     * Display the specified resource.
      *
-     * @return Response
+     * @param  int $id
+     * @return \Illuminate\Http\Response
      */
-    public function get()
+    public function show($id)
     {
-         return response()->json(['users' =>  User::all()], 200);
+        return null;
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\Response
+     */
+    public function store(Request $request) 
+    {
+        return null;
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request $request
+     * @param  int $id
+     * @return \Illuminate\Http\Response
+     */
+    public function update(
+        Request $request, 
+        $id
+    ) {
+        return null;
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  int $id
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy($id)
+    {
+        return null;
     }
 }
