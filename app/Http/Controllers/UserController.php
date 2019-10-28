@@ -4,7 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use  App\Repositories\UserRepository;
+use App\Repositories\UserRepository;
+use App\Transformers\UserTransformer;
 
 class UserController extends ApiController
 {
@@ -16,7 +17,7 @@ class UserController extends ApiController
      */
     public function index(Request $request, UserRepository $userRepository)
     {
-        return response()->json(['users' =>  $userRepository->get()], 200);   
+        return $this->respondWithCollection($userRepository->get(), new UserTransformer());
     }
 
     /**
