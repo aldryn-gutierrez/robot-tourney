@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
+use App\Repositories\UserRepository;
+use App\Transformers\UserTransformer;
+use Exception;
 use Illuminate\Http\Request;
-use  App\Models\User;
-
 use Illuminate\Support\Facades\Auth;
+use Log;
 
 class AuthController extends ApiController
 {
@@ -15,9 +18,8 @@ class AuthController extends ApiController
      * @param  Request  $request
      * @return Response
      */
-    public function register(Request $request)
+    public function register(Request $request, UserRepository $userRepository)
     {
-        //validate incoming request 
         $this->validate($request, [
             'name' => 'required|string',
             'email' => 'required|email|unique:users',
@@ -25,23 +27,22 @@ class AuthController extends ApiController
         ]);
 
         try {
+            $user = $userRepository->create([
+                'name' => $request->input('name'),
+                'email' => $request->input('email'),
+                'password' => app('hash')->make($request->input('password')),
+            ]);
+            
+            return $this->respondWithItem($user, new UserTransformer(), [], 201);
+        } catch (\Exception $exception) {
+            Log::error('Register encountered an unexpected error', [
+                'line' => $exception->getLine(),
+                'message' => $exception->getMessage(),
+                'file' => $exception->getFile(),
+            ]);
 
-            $user = new User;
-            $user->name = $request->input('name');
-            $user->email = $request->input('email');
-            $plainPassword = $request->input('password');
-            $user->password = app('hash')->make($plainPassword);
-
-            $user->save();
-
-            //return successful response
-            return response()->json(['user' => $user, 'message' => 'CREATED'], 201);
-
-        } catch (\Exception $e) {
-            //return error message
-            return response()->json(['message' => 'User Registration Failed!'], 409);
+            return $this->respondWithError("Registering User Encountered an Unexpected Error", 409);
         }
-
     }
 
     /**
@@ -52,7 +53,6 @@ class AuthController extends ApiController
      */
     public function login(Request $request)
     {
-          //validate incoming request 
         $this->validate($request, [
             'email' => 'required|string',
             'password' => 'required|string',
@@ -60,8 +60,8 @@ class AuthController extends ApiController
 
         $credentials = $request->only(['email', 'password']);
 
-        if (! $token = Auth::attempt($credentials)) {
-            return response()->json(['message' => 'Unauthorized'], 401);
+        if (!$token = Auth::attempt($credentials)) {
+            return $this->respondWithArray(['message' => 'Unauthorized'], [], 401);
         }
 
         return $this->respondWithToken($token);

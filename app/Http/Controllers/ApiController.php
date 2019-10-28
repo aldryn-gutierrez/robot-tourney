@@ -4,12 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Transformers\PlainArraySerializer;
+use Illuminate\Http\JsonResponse as Response;
 use Illuminate\Support\Facades\Auth;
 use League\Fractal;
 use League\Fractal\Manager;
 use League\Fractal\Resource\Collection;
 use League\Fractal\Resource\Item;
-use Illuminate\Http\JsonResponse as Response;
 
 class ApiController extends Controller
 {
@@ -32,8 +32,14 @@ class ApiController extends Controller
         $this->statusCode = $statusCode;
     }
 
-    protected function respondWithItem($item, $transformer, $resourceKey = null, $includes = [])
-    {
+    protected function respondWithItem(
+        $item, 
+        $transformer, 
+        $includes = [], 
+        $statusCode = 200,
+        $resourceKey = null, 
+        array $headers = []
+    ) {
         if (!empty($includes)) {
             $this->fractal->parseIncludes($includes);
         }
@@ -41,7 +47,7 @@ class ApiController extends Controller
         $resource = new Item($item, $transformer, $resourceKey);
         $dataFromResource = $this->fractal->createData($resource);
 
-        return $this->respondWithArray($dataFromResource->toArray());
+        return $this->respondWithArray($dataFromResource->toArray(), $headers, $statusCode);
     }
 
     protected function respondWithArray(array $array, array $headers = [], $statusCode = 200)
