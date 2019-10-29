@@ -27,6 +27,7 @@ $router->group(['prefix' => 'api'], function () use ($router) {
         $router->get('/', 'RobotController@index');
         $router->get('/{id}', 'RobotController@show');
         $router->post('/', 'RobotController@store');
+        $router->post('/uploadSpreadsheet', 'RobotController@storeBySpreadsheet');
         $router->patch('/{id}', 'RobotController@update');
         $router->delete('/{id}', 'RobotController@destroy');
     });

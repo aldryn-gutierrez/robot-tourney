@@ -33,11 +33,11 @@ class ApiController extends Controller
     }
 
     protected function respondWithItem(
-        $item, 
-        $transformer, 
-        $includes = [], 
+        $item,
+        $transformer,
+        $includes = [],
         $statusCode = 200,
-        $resourceKey = null, 
+        $resourceKey = null,
         array $headers = []
     ) {
         if (!empty($includes)) {
@@ -73,7 +73,7 @@ class ApiController extends Controller
         );
     }
 
-    protected function respondWithCollection($collection, $transformer, $includes = [], $metadata = null)
+    protected function respondWithCollection($collection, $transformer, $includes = [], $statusCode = 200, $metadata = null, $headers = [])
     {
         if (!empty($includes)) {
             $this->fractal->parseIncludes($includes);
@@ -86,7 +86,7 @@ class ApiController extends Controller
 
         $dataFromResource = $this->fractal->createData($resource);
 
-        return $this->respondWithArray($dataFromResource->toArray());
+        return $this->respondWithArray($dataFromResource->toArray(), $headers, $statusCode);
     }
 
     protected function respondWithNoContent(array $headers = [], $statusCode = 204)

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\SpreadsheetHelperException;
 use App\Repositories\Criteria\IncludeCriteria;
 use App\Repositories\Criteria\GenericCriteria;
 use App\Repositories\RobotRepository;
@@ -11,6 +12,9 @@ use DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Log;
+use Validator;
+
+use App\Libraries\Spreadsheets\SpoutSpreadsheetHelper as SpreadsheetHelper;
 
 class RobotController extends ApiController
 {
@@ -114,6 +118,98 @@ class RobotController extends ApiController
     }
 
     /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\Response
+     */
+    public function storeBySpreadsheet(
+        Request $request,
+        SpreadsheetHelper $spreadsheetHelper,
+        RobotRepository $robotRepository,
+        UserRobotRepository $userRobotRepository
+    ) {
+        $this->validate($request, [
+            'robot_spreadsheet' => 'required|file|max:1000',
+        ]);
+
+        # Extract Data from the Spreadsheet File
+        $data = [];
+        try {
+            $reader = $spreadsheetHelper->createReaderFromStream($request->robot_spreadsheet);
+            $sheets = $spreadsheetHelper->getSheets($request->robot_spreadsheet, $reader);
+
+            if (iterator_count($sheets) > 1) {
+                return $this->respondWithError("Spreadsheet contains more than one sheet, please combine in one sheet", 422);
+            }
+
+            $data = $spreadsheetHelper->convertSheetsToArray($sheets);
+            $spreadsheetHelper->closeReader($reader);
+        } catch (SpreadsheetHelperException $exception) {
+            return $this->respondWithError($exception->getMessage(), 409);
+        } catch (\Exception $exception) {
+            Log::error(
+                "Robot Spreadsheet Data Extraction encountered an Unexpected Error",
+                [
+                    'line' => $exception->getLine(),
+                    'message' => $exception->getMessage(),
+                    'file' => $exception->getFile(),
+                ]
+            );
+
+            return $this->respondWithError("Robot Spreadsheet Data Extraction encountered an Unexpected Error", 409);
+        }
+
+        // Validate the Extracted Spreadsheet Data
+        $validator = Validator::make(['spreadsheet' => $data], [
+            'spreadsheet.*.name' => 'required|string|unique:robots',
+            'spreadsheet.*.weight' => 'required|numeric|min:1',
+            'spreadsheet.*.power' => 'required|numeric|min:1',
+            'spreadsheet.*.speed' => 'required|numeric|min:1',
+        ]);
+
+        if ($validator->fails()) {
+            $validationErrorMessage = implode(', ', $validator->errors()->all());
+            return $this->respondWithError($validationErrorMessage, 422);
+        }
+
+        try {
+            $userId = $request->user()->getKey();
+            $robots = DB::transaction(
+                function () use ($userId, $data, $robotRepository, $userRobotRepository) {
+                    $robots = collect();
+                    $userRobotData = [];
+                    foreach ($data as $robotData) {
+                        $robot = $robotRepository->create([
+                            'name' => $robotData['name'],
+                            'weight' => $robotData['weight'],
+                            'power' => $robotData['power'],
+                            'speed' => $robotData['speed'],
+                        ]);
+
+                        $userRobotData[] = ['robot_id' => $robot->getKey(), 'user_id' => $userId];
+                        $robots[] = $robot;
+                    }
+
+                    $userRobotRepository->insert($userRobotData);
+
+                    return $robots;
+                }
+            );
+
+            return $this->respondWithCollection($robots, new RobotTransformer(), [], 201);
+        } catch (\Exception $exception) {
+            Log::error('Robot Spreadsheet Creation encountered an Unexpected Error', [
+                'line' => $exception->getLine(),
+                'message' => $exception->getMessage(),
+                'file' => $exception->getFile(),
+            ]);
+
+            return $this->respondWithError("Robot Spreadsheet Creation encountered an Unexpected Error", 409);
+        }
+    }
+
+    /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request $request
@@ -165,7 +261,7 @@ class RobotController extends ApiController
      * @param  int $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id, RobotRepository $robotRepository, UserRobotRepository $userRobotRepository)
+    public function destroy($id, RobotRepository $robotRepository)
     {
         try {
             $robot = $robotRepository->findByIdAndUserId($id, Auth::user()->getKey());
