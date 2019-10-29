@@ -32,7 +32,7 @@ class AuthController extends ApiController
                 'email' => $request->input('email'),
                 'password' => app('hash')->make($request->input('password')),
             ]);
-            
+
             return $this->respondWithItem($user, new UserTransformer(), [], 201);
         } catch (\Exception $exception) {
             Log::error('Register encountered an unexpected error', [
@@ -60,8 +60,18 @@ class AuthController extends ApiController
 
         $credentials = $request->only(['email', 'password']);
 
-        if (!$token = Auth::attempt($credentials)) {
-            return $this->respondWithArray(['message' => 'Unauthorized'], [], 401);
+        try {
+            if (!$token = Auth::attempt($credentials)) {
+                return $this->respondWithArray(['message' => 'Unauthorized'], [], 401);
+            }
+        } catch (\Exception $exception) {
+            Log::error('Login encountered an unexpected error', [
+                'line' => $exception->getLine(),
+                'message' => $exception->getMessage(),
+                'file' => $exception->getFile(),
+            ]);
+
+            return $this->respondWithError("Login encountered an Unexpected Error", 409);
         }
 
         return $this->respondWithToken($token);

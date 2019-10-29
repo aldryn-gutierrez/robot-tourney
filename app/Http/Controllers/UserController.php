@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace App\Http\Controllers;
 
@@ -37,7 +37,7 @@ class UserController extends ApiController
      * @param  \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request) 
+    public function store(Request $request)
     {
         return null;
     }
@@ -50,7 +50,7 @@ class UserController extends ApiController
      * @return \Illuminate\Http\Response
      */
     public function update(
-        Request $request, 
+        Request $request,
         $id
     ) {
         return null;

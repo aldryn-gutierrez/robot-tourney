@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace App\Repositories;
 
@@ -18,7 +18,7 @@ abstract class BaseRepository implements RepositoryContract, CriteriaContract
 
     protected $skipCriteria = false;
 
-    public function __construct() 
+    public function __construct()
     {
         $this->makeModel();
         $this->criteria = collect();
@@ -26,7 +26,7 @@ abstract class BaseRepository implements RepositoryContract, CriteriaContract
 
     /**
      * Specify Model name
-     * 
+     *
      * @return string
      */
     abstract function getModelName();
@@ -35,16 +35,16 @@ abstract class BaseRepository implements RepositoryContract, CriteriaContract
      * @return Model
      * @throws RepositoryException
      */
-    public function makeModel() 
+    public function makeModel()
     {
         $modelName = $this->getModelName();
         if (!class_exists($modelName)) {
             throw new RepositoryException("$modelName is an invalid class");
         }
-        
+
         $model = new $modelName;
         if (!$model instanceof Model) {
-            
+
             throw new RepositoryException(
                 "Class {$this->getModelName()} must be an instance of Illuminate\\Database\\Eloquent\\Model"
             );
@@ -58,7 +58,7 @@ abstract class BaseRepository implements RepositoryContract, CriteriaContract
      * @param  array $columns
      * @return mixed
      */
-    public function all(array $columns = ['*']) 
+    public function all(array $columns = ['*'])
     {
         return $this->model->get($columns);
     }
@@ -71,13 +71,13 @@ abstract class BaseRepository implements RepositoryContract, CriteriaContract
         $this->applyCriteria();
         return $this->model->get();
     }
- 
+
     /**
      * @param  array $data
      * @return mixed
      */
-    public function create(array $data) 
-    {    
+    public function create(array $data)
+    {
         $this->makeModel();
 
         foreach ($data as $key => $value) {
@@ -88,7 +88,7 @@ abstract class BaseRepository implements RepositoryContract, CriteriaContract
 
         return $this->model;
     }
- 
+
     /**
      * @param  array $data
      * @param  $id
@@ -99,7 +99,7 @@ abstract class BaseRepository implements RepositoryContract, CriteriaContract
     {
         $this->model->where($attribute, '=', $id)->update($data);
 
-        return $returnFreshModel ? $this->find($id) : null;
+        return $returnFreshModel ? $this->model->find($id) : null;
     }
 
     /**
@@ -118,7 +118,7 @@ abstract class BaseRepository implements RepositoryContract, CriteriaContract
         $this->applyCriteria();
         return $this->model->delete();
     }
- 
+
     /**
      * @return mixed
      **/
@@ -174,14 +174,14 @@ abstract class BaseRepository implements RepositoryContract, CriteriaContract
      * @return mixed
      */
     public function paginate(
-        $limit = 100, 
-        $page = 1, 
+        $limit = 100,
+        $page = 1,
         array $columns = ['*']
     ) {
         $this->applyCriteria();
         return $this->model->simplePaginate($limit, $columns, 'page', $page)->items();
     }
-    
+
     /**
      * Reinitialize Repository Scope
      *
@@ -194,9 +194,9 @@ abstract class BaseRepository implements RepositoryContract, CriteriaContract
 
         return $this;
     }
- 
+
     /**
-     * Sets flag whether Criteria must be considered 
+     * Sets flag whether Criteria must be considered
      *
      * @param bool $status
      * @return $this
@@ -205,18 +205,18 @@ abstract class BaseRepository implements RepositoryContract, CriteriaContract
         $this->skipCriteria = $status;
         return $this;
     }
- 
+
     /**
-     * Get Criteria 
+     * Get Criteria
      *
      * @return mixed
      */
     public function getCriteria() {
         return $this->criteria;
     }
- 
+
     /**
-     * Get Model With Criteria 
+     * Get Model With Criteria
      *
      * @param Criteria $criteria
      * @return $this
@@ -225,7 +225,7 @@ abstract class BaseRepository implements RepositoryContract, CriteriaContract
         $this->model = $criteria->apply($this->model, $this);
         return $this;
     }
- 
+
     /**
      * Insert new Criteria
      *
@@ -236,7 +236,7 @@ abstract class BaseRepository implements RepositoryContract, CriteriaContract
         $this->criteria->push($criteria);
         return $this;
     }
- 
+
     /**
      * Apply Criteria to Model
      *
@@ -246,13 +246,13 @@ abstract class BaseRepository implements RepositoryContract, CriteriaContract
         if ($this->skipCriteria === true) {
             return $this;
         }
- 
+
         foreach ($this->getCriteria() as $criteria) {
             if ($criteria instanceof Criteria) {
                 $this->model = $criteria->apply($this->model, $this);
             }
         }
- 
+
         return $this;
     }
 

@@ -25,6 +25,9 @@ $router->group(['prefix' => 'api'], function () use ($router) {
 
     $router->group(['prefix' => 'robot', 'middleware' => 'auth'], function () use ($router) {
         $router->get('/', 'RobotController@index');
+        $router->get('/{id}', 'RobotController@show');
         $router->post('/', 'RobotController@store');
+        $router->patch('/{id}', 'RobotController@update');
+        $router->delete('/{id}', 'RobotController@destroy');
     });
 });
