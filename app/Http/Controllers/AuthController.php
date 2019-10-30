@@ -16,6 +16,7 @@ class AuthController extends ApiController
      * Store a new user.
      *
      * @param  Request  $request
+     *
      * @return Response
      */
     public function register(Request $request, UserRepository $userRepository)
@@ -49,6 +50,7 @@ class AuthController extends ApiController
      * Get a JWT via given credentials.
      *
      * @param  Request  $request
+     *
      * @return Response
      */
     public function login(Request $request)

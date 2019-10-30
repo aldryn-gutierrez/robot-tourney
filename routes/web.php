@@ -21,6 +21,7 @@ $router->group(['prefix' => 'api'], function () use ($router) {
 
     $router->group(['prefix' => 'user', 'middleware' => 'auth'], function () use ($router) {
         $router->get('/', 'UserController@index');
+        $router->patch('/{id}', 'UserController@update');
     });
 
     $router->group(['prefix' => 'robot', 'middleware' => 'auth'], function () use ($router) {

@@ -28,8 +28,23 @@ class RobotController extends ApiController
      */
     public function index(Request $request, RobotRepository $robotRepository)
     {
+        $this->validate($request, [
+            'limit' => 'nullable|integer|min:1|max:'.env('PAGINATION_LIMIT'),
+            'page' => 'nullable|integer|min:1',
+        ]);
+
+        $limit = env('PAGINATION_LIMIT');
+        if ($request->exists('limit')) {
+            $limit = $request->input('limit');
+        }
+
+        $page = 1;
+        if ($request->exists('page')) {
+            $page = $request->input('page');
+        }
+
         try {
-            $robots = $robotRepository->pushCriteria(new IncludeCriteria(['users']))->get();
+            $robots = $robotRepository->pushCriteria(new IncludeCriteria(['users']))->paginate($limit, $page);
         } catch (Exception $exception) {
             Log::error('Getting Robots encountered an unexpected error', [
                 'line' => $exception->getLine(),
