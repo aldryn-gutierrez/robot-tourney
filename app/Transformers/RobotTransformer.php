@@ -45,5 +45,4 @@ class RobotTransformer extends TransformerAbstract
     {
         return $this->item($robot->user(), new UserTransformer(), false);
     }
-
 }

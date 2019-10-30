@@ -29,4 +29,20 @@ class Robot extends Model
     {
         return $this->users()->first();
     }
+
+    /**
+     * Get the damage this robot can incur.
+     */
+    public function getAttackPoints()
+    {
+        return $this->power + $this->weight + $this->speed;
+    }
+
+    /**
+     * Get all the Challenger Records related to Robot
+     */
+    public function challengers()
+    {
+        return $this->hasMany('App\Models\Challenger', 'robot_id', 'id');
+    }
 }

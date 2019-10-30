@@ -3,18 +3,18 @@
 namespace App\Http\Controllers;
 
 use App\Exceptions\SpreadsheetHelperException;
+use App\Libraries\Spreadsheets\SpoutSpreadsheetHelper as SpreadsheetHelper;
 use App\Repositories\Criteria\IncludeCriteria;
 use App\Repositories\Criteria\GenericCriteria;
 use App\Repositories\RobotRepository;
 use App\Repositories\UserRobotRepository;
 use App\Transformers\RobotTransformer;
 use DB;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Log;
 use Validator;
-
-use App\Libraries\Spreadsheets\SpoutSpreadsheetHelper as SpreadsheetHelper;
 
 class RobotController extends ApiController
 {
@@ -22,13 +22,15 @@ class RobotController extends ApiController
      * Display a listing of the resource.
      *
      * @param  \Illuminate\Http\Request $request
+     * @param  \App\Repositories\RobotRepository $robotRepository
+     *
      * @return \Illuminate\Http\Response
      */
     public function index(Request $request, RobotRepository $robotRepository)
     {
         try {
             $robots = $robotRepository->pushCriteria(new IncludeCriteria(['users']))->get();
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             Log::error('Getting Robots encountered an unexpected error', [
                 'line' => $exception->getLine(),
                 'message' => $exception->getMessage(),
@@ -45,6 +47,8 @@ class RobotController extends ApiController
      * Display the specified resource.
      *
      * @param  int $id
+     * @param  \App\Repositories\RobotRepository $robotRepository
+     *
      * @return \Illuminate\Http\Response
      */
     public function show($id, RobotRepository $robotRepository)
@@ -57,7 +61,7 @@ class RobotController extends ApiController
             }
 
             return $this->respondWithItem($robot, new RobotTransformer(), ['user']);
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             Log::error('Showing Robot encountered an unexpected error', [
                 'line' => $exception->getLine(),
                 'message' => $exception->getMessage(),
@@ -72,6 +76,9 @@ class RobotController extends ApiController
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request $request
+     * @param  \App\Repositories\RobotRepository $robotRepository
+     * @param  \App\Repositories\UserRobotRepository $userRobotRepository
+     *
      * @return \Illuminate\Http\Response
      */
     public function store(
@@ -104,9 +111,7 @@ class RobotController extends ApiController
                     return $robot;
                 }
             );
-
-            return $this->respondWithItem($robot, new RobotTransformer(), [], 201);
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             Log::error('Robot creation encountered an unexpected error', [
                 'line' => $exception->getLine(),
                 'message' => $exception->getMessage(),
@@ -115,12 +120,18 @@ class RobotController extends ApiController
 
             return $this->respondWithError("Robot creation encountered an Unexpected Error", 409);
         }
+
+        return $this->respondWithItem($robot, new RobotTransformer(), [], 201);
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Store a newly created resource by Spreadsheet in storage.
      *
      * @param  \Illuminate\Http\Request $request
+     * @param  \App\Libraries\Spreadsheets\SpoutSpreadsheetHelper $spreadsheetHelper
+     * @param  \App\Repositories\RobotRepository $robotRepository
+     * @param  \App\Repositories\UserRobotRepository $userRobotRepository
+     *
      * @return \Illuminate\Http\Response
      */
     public function storeBySpreadsheet(
@@ -147,7 +158,7 @@ class RobotController extends ApiController
             $spreadsheetHelper->closeReader($reader);
         } catch (SpreadsheetHelperException $exception) {
             return $this->respondWithError($exception->getMessage(), 409);
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             Log::error(
                 "Robot Spreadsheet Data Extraction encountered an Unexpected Error",
                 [
@@ -196,9 +207,7 @@ class RobotController extends ApiController
                     return $robots;
                 }
             );
-
-            return $this->respondWithCollection($robots, new RobotTransformer(), [], 201);
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             Log::error('Robot Spreadsheet Creation encountered an Unexpected Error', [
                 'line' => $exception->getLine(),
                 'message' => $exception->getMessage(),
@@ -207,6 +216,8 @@ class RobotController extends ApiController
 
             return $this->respondWithError("Robot Spreadsheet Creation encountered an Unexpected Error", 409);
         }
+
+        return $this->respondWithCollection($robots, new RobotTransformer(), [], 201);
     }
 
     /**
@@ -214,6 +225,8 @@ class RobotController extends ApiController
      *
      * @param  \Illuminate\Http\Request $request
      * @param  int $id
+     * @param  \App\Repositories\RobotRepository $robotRepository
+     *
      * @return \Illuminate\Http\Response
      */
     public function update(
@@ -242,7 +255,7 @@ class RobotController extends ApiController
             if ($dataToUpdate) {
                 $robot = $robotRepository->update($dataToUpdate, $id);
             }
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             Log::error('Robot update encountered an unexpected error', [
                 'line' => $exception->getLine(),
                 'message' => $exception->getMessage(),
@@ -259,6 +272,8 @@ class RobotController extends ApiController
      * Remove the specified resource from storage.
      *
      * @param  int $id
+     * @param  \App\Repositories\RobotRepository $robotRepository
+     *
      * @return \Illuminate\Http\Response
      */
     public function destroy($id, RobotRepository $robotRepository)
@@ -272,9 +287,7 @@ class RobotController extends ApiController
             DB::transaction(function () use ($robotRepository, $id) {
                 $robotRepository->delete($id);
             });
-
-            return $this->respondWithNoContent();
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             Log::error('Robot deletion encountered an unexpected error', [
                 'line' => $exception->getLine(),
                 'message' => $exception->getMessage(),
@@ -283,5 +296,7 @@ class RobotController extends ApiController
 
             return $this->respondWithError("Robot deletion encountered an Unexpected Error", 409);
         }
+
+        return $this->respondWithNoContent();
     }
 }

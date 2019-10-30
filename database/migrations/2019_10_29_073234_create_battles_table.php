@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateRobotsTable extends Migration
+class CreateBattlesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,12 +13,9 @@ class CreateRobotsTable extends Migration
      */
     public function up()
     {
-        Schema::create('robots', function (Blueprint $table) {
+        Schema::create('battles', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('name')->unique()->notNullable();
-            $table->decimal('weight', 8, 2);
-            $table->decimal('power', 8, 2);
-            $table->decimal('speed', 8, 2);
+            $table->string('location');
             $table->timestamps();
         });
     }
@@ -30,6 +27,6 @@ class CreateRobotsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('robots');
+        Schema::dropIfExists('battles');
     }
 }

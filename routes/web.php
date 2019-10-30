@@ -31,4 +31,10 @@ $router->group(['prefix' => 'api'], function () use ($router) {
         $router->patch('/{id}', 'RobotController@update');
         $router->delete('/{id}', 'RobotController@destroy');
     });
+
+    $router->group(['prefix' => 'battle', 'middleware' => 'auth'], function () use ($router) {
+        $router->post('/fight', 'BattleController@fight');
+        $router->get('/results', 'BattleController@results');
+        $router->get('/leaderboard', 'BattleController@leaderboard');
+    });
 });
