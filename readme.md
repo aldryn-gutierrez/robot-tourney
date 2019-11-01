@@ -1,21 +1,30 @@
-# Lumen PHP Framework
+# Installation
 
-[![Build Status](https://travis-ci.org/laravel/lumen-framework.svg)](https://travis-ci.org/laravel/lumen-framework)
-[![Total Downloads](https://poser.pugx.org/laravel/lumen-framework/d/total.svg)](https://packagist.org/packages/laravel/lumen-framework)
-[![Latest Stable Version](https://poser.pugx.org/laravel/lumen-framework/v/stable.svg)](https://packagist.org/packages/laravel/lumen-framework)
-[![Latest Unstable Version](https://poser.pugx.org/laravel/lumen-framework/v/unstable.svg)](https://packagist.org/packages/laravel/lumen-framework)
-[![License](https://poser.pugx.org/laravel/lumen-framework/license.svg)](https://packagist.org/packages/laravel/lumen-framework)
+Install all the dependencies:
 
-Laravel Lumen is a stunningly fast PHP micro-framework for building web applications with expressive, elegant syntax. We believe development must be an enjoyable, creative experience to be truly fulfilling. Lumen attempts to take the pain out of development by easing common tasks used in the majority of web projects, such as routing, database abstraction, queueing, and caching.
+    composer install
 
-## Official Documentation
+Create an .env file and copy all the contents from .env.example in the root directory of the project:
 
-Documentation for the framework can be found on the [Lumen website](https://lumen.laravel.com/docs).
+    vim ~/PROJECT_PATH/.env
 
-## Security Vulnerabilities
+Note: 
+Ensure that you specify:
 
-If you discover a security vulnerability within Lumen, please send an e-mail to Taylor Otwell at taylor@laravel.com. All security vulnerabilities will be promptly addressed.
+*APP_KEY*
+- You must specify a 32 character long string for this variable
 
-## License
+*DB_HOST*, *DB_PORT*, *DB_DATABASE*, *DB_USERNAME*, *DB_PASSWORD*
+- You must specify a valid database credentials for persistence
 
-The Lumen framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Generate token for Json Web Token Authentication:
+
+    php artisan jwt:secret
+
+Migrate all the database table:
+
+    php artisan migrate
+
+Now its time to run your application locally
+
+    php -S localhost:8800 -t public
