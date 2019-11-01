@@ -26,9 +26,9 @@ class RobotTransformer extends TransformerAbstract
         return [
             'id' => $robot->id,
             'name' => $robot->name,
-            'weight' => $robot->weight,
-            'power' => $robot->power,
-            'speed' => $robot->speed,
+            'weight' => (float) $robot->weight,
+            'power' => (float) $robot->power,
+            'speed' => (float) $robot->speed,
             'created_at' => (string) $robot->created_at,
             'updated_at' => (string) $robot->updated_at,
         ];

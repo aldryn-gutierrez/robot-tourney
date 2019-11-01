@@ -65,7 +65,7 @@ class BattleController extends ApiController
                 $endDate
             );
             if ($robotChallengedCount >= $maxRobotChallenges) {
-                return $this->respondWithError('Robot has fought '.$maxRobotChallenges.' battles already. Please try tomorrow!');
+                return $this->respondWithError('Robot has fought '.$maxRobotChallenges.' battles already. Please try tomorrow!', 422);
             }
 
             // Validate the Opponent Robot's challenge count
@@ -77,7 +77,7 @@ class BattleController extends ApiController
                 $endDate
             );
             if ($opponentRobotChallengedCount >= $maxOpponentRobotChallenges) {
-                return $this->respondWithError('Opponent Robot has already been challenged for today!');
+                return $this->respondWithError('Opponent Robot has already been challenged for today!', 422);
             }
 
             // Query the Robots selected to fight against
@@ -107,8 +107,6 @@ class BattleController extends ApiController
             }
 
             $challengerRepository->insert($challengers);
-
-            return $this->respondWithItem($battle, new BattleTransformer());
         } catch (Exception $exception) {
             Log::error('Robot Fight encountered an unexpected error', [
                 'line' => $exception->getLine(),
@@ -118,6 +116,8 @@ class BattleController extends ApiController
 
             return $this->respondWithError("Robot Fight encountered an Unexpected Error", 409);
         }
+
+        return $this->respondWithItem($battle, new BattleTransformer());
     }
 
     /**
@@ -149,8 +149,6 @@ class BattleController extends ApiController
             $battles = $battleRepository->pushCriteria(new IncludeCriteria(['challengers.robot']))
                 ->pushCriteria(new OrderCriteria('id', 'desc'))
                 ->paginate($limit, $page);
-
-            return $this->respondWithCollection($battles, new BattleResultTransformer());
         } catch (Exception $exception) {
             Log::error('Battle Results encountered an unexpected error', [
                 'line' => $exception->getLine(),
@@ -160,6 +158,8 @@ class BattleController extends ApiController
 
             return $this->respondWithError("Battle Results encountered an Unexpected Error", 409);
         }
+
+        return $this->respondWithCollection($battles, new BattleResultTransformer());
     }
 
     /**
@@ -190,8 +190,6 @@ class BattleController extends ApiController
 
         try {
             $leaderboard = $challengerRepository->getLeaderboard($page, $limit);
-
-            return $this->respondWithArray(['data' => $leaderboard]);
         } catch (Exception $exception) {
             Log::error('Battle Results encountered an unexpected error', [
                 'line' => $exception->getLine(),
@@ -201,5 +199,7 @@ class BattleController extends ApiController
 
             return $this->respondWithError("Battle Results encountered an Unexpected Error", 409);
         }
+
+        return $this->respondWithArray(['data' => $leaderboard]);
     }
 }

@@ -46,7 +46,7 @@ class UserControllerTest extends TestCase
         $expectedData = [
             'error' => [
                 'http_code' => 409,
-                'message' => 'Battle Results encountered an Unexpected Error',
+                'message' => 'Getting users encountered an Unexpected Error',
             ],
         ];
 

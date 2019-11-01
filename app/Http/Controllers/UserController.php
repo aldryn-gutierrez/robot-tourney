@@ -37,13 +37,13 @@ class UserController extends ApiController
         try {
             $users = $userRepository->paginate($limit, $page);
         } catch (Exception $exception) {
-            Log::error('Battle Results encountered an unexpected error', [
+            Log::error('Getting users encountered an unexpected error', [
                 'line' => $exception->getLine(),
                 'message' => $exception->getMessage(),
                 'file' => $exception->getFile(),
             ]);
 
-            return $this->respondWithError("Battle Results encountered an Unexpected Error", 409);
+            return $this->respondWithError("Getting users encountered an Unexpected Error", 409);
         }
 
         return $this->respondWithCollection($users, new UserTransformer());

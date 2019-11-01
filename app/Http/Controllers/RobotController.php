@@ -74,8 +74,6 @@ class RobotController extends ApiController
             if (!$robot) {
                 return $this->respondWithError('Robot not found', 404);
             }
-
-            return $this->respondWithItem($robot, new RobotTransformer(), ['user']);
         } catch (Exception $exception) {
             Log::error('Showing Robot encountered an unexpected error', [
                 'line' => $exception->getLine(),
@@ -85,6 +83,8 @@ class RobotController extends ApiController
 
             return $this->respondWithError("Showing Robot encountered an Unexpected Error", 409);
         }
+
+        return $this->respondWithItem($robot, new RobotTransformer(), ['user']);
     }
 
     /**
@@ -172,7 +172,7 @@ class RobotController extends ApiController
             $data = $spreadsheetHelper->convertSheetsToArray($sheets);
             $spreadsheetHelper->closeReader($reader);
         } catch (SpreadsheetHelperException $exception) {
-            return $this->respondWithError($exception->getMessage(), 409);
+            return $this->respondWithError($exception->getMessage(), 422);
         } catch (Exception $exception) {
             Log::error(
                 "Robot Spreadsheet Data Extraction encountered an Unexpected Error",

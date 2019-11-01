@@ -27,5 +27,5 @@ abstract class TestCase extends LumenTestCase
         $method->setAccessible(true);
 
         return $method;
-      }
+    }
 }

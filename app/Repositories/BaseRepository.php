@@ -113,6 +113,9 @@ abstract class BaseRepository implements RepositoryContract, CriteriaContract
         return $this->model->destroy($id);
     }
 
+    /**
+     * @return bool
+     */
     public function deleteByCriteria()
     {
         $this->applyCriteria();
@@ -128,12 +131,6 @@ abstract class BaseRepository implements RepositoryContract, CriteriaContract
         return $this->model->first();
     }
 
-    public function chunk($count, callable $callback)
-    {
-        $this->applyCriteria();
-        return $this->model->chunk($count, $callback);
-    }
-
     /**
      * @return int
      **/
@@ -143,28 +140,13 @@ abstract class BaseRepository implements RepositoryContract, CriteriaContract
         return $this->model->count();
     }
 
+    /**
+     * @param  array   $data
+     * @return bool
+     */
     public function insert(array $data)
     {
         return $this->model->insert($data);
-    }
-
-    public function existsByFields($fieldsAndValues, $id = null)
-    {
-        $model = $this->model;
-
-        foreach ($fieldsAndValues as $field => $value) {
-            if (is_array($value)) {
-                $model = $model->whereIn($field, $value);
-            } else {
-                $model = $model->where($field, $value);
-            }
-        }
-
-        if (!is_null($id)) {
-            $model = $model->where('id', '!=', $id);
-        }
-
-        return $model->exists();
     }
 
     /**
