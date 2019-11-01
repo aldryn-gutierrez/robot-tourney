@@ -28,3 +28,13 @@ Migrate all the database table:
 Now its time to run your application locally
 
     php -S localhost:8800 -t public
+
+
+# Endpoints
+
+Authentication Endpoint
+
+| ACTION |ENDPOINT  | DESCRIPTION |PARAMETERS  |RESPONSE CODES  |
+|--|--|--|--|--|
+| POST | /register | Create a new account | name: string <br>email: email<br>password: string<br>password_confirmation: same input as password field | 422: Input Validation Error<br>409: Unexpected Error<br>201: Success |
+| POST | /login | Login a registered account | email: email<br>password: string | 401: Unauthorized<br>409: Unexpected Error<br>200: Success |
