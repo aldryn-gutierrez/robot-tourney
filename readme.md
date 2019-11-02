@@ -1,3 +1,7 @@
+# Robot Tourney
+
+This application allows you to create your own robots and fight across other users with robots. 
+
 # Installation
 
 Install all the dependencies:
@@ -41,12 +45,16 @@ Now its time to run your application locally
 
 **User Endpoint**
 
+Ensure that you have the Authorization Key and the token in the value inside the Headers
+
 | ACTION |ENDPOINT  | DESCRIPTION |PARAMETERS  |RESPONSE CODES  | DATA |
 |--|--|--|--|--|--|
 | GET | /api/user | Get all the Users | limit: integer, optional<br>page: integer, optional | 422: Input Validation Error<br>409: Unexpected Error<br>200: Success | `{"data":[{"id":1,"name":"Jay Doe","email":"jay@doe.com","created_at":"2019-11-01 07:12:09","updated_at":"2019-11-01 07:12:09"}]}` |
 | PATCH  | /api/user/{id} | Update an User | name: string, optional | 422: Input Validation Error<br>409: Unexpected Error<br>200: Success | `{"data":{"id":1,"name":"Jay Doe","email":"jay@doe.com","created_at":"2019-11-01 07:12:09","updated_at":"2019-11-01 07:12:09"}}` |
 
 **Robot Endpoint**
+
+Ensure that you have the Authorization Key and the token in the value inside the Headers
 
 | ACTION |ENDPOINT  | DESCRIPTION |PARAMETERS  |RESPONSE CODES  | . |
 |--|--|--|--|--|--|
@@ -59,8 +67,16 @@ Now its time to run your application locally
 
 **Battle Endpoint**
 
+Ensure that you have the Authorization Key and the token in the value inside the Headers
+
 | ACTION |ENDPOINT  | DESCRIPTION |PARAMETERS  |RESPONSE CODES  | . |
 |--|--|--|--|--|--|
 | POST | /api/battle/fight | Fight a robot | location: string<br>robot_id: integer<br>opponent_robot_id: integer | 422: Input Validation Error<br>409: Unexpected Error<br>200: Success | `{"data":{"id":1,"location":"Hiroshima","created_at":"2019-11-01 07:44:55","updated_at":"2019-11-01 07:44:55","challengers":[{"id":1,"robot_id":1,"user_id":1,"battle_id":1,"is_victorious":1,"is_initiator":1,"created_at":"2019-11-01 07:44:55","updated_at":""},{"id":2,"robot_id":2,"user_id":1,"battle_id":1,"is_victorious":0,"is_initiator":0,"created_at":"2019-11-01 07:44:55","updated_at":""}]}}` |
 | GET | /api/battle/results | Get the battle results | limit: integer, optional<br>page: integer, optional | 422: Input Validation Error<br> 409: Unexpected Error<br> 200: Success | `{"data":[{"id":3,"location":"Kyoto","winning_robot":{"id":4,"name":"Slack","weight":"122.00","power":"3.00","speed":"2.00"},"defeated_robot":{"id":1,"name":"Terminal","weight":"90.32","power":"2.00","speed":"3.00"},"created_at":"2019-11-01 07:48:42","updated_at":"2019-11-01 07:48:42"},{"id":2,"location":"Hiroshima","winning_robot":{"id":1,"name":"Terminal","weight":"90.32","power":"2.00","speed":"3.00"},"defeated_robot":{"id":3,"name":"Paw","weight":"39.00","power":"2.00","speed":"2.00"},"created_at":"2019-11-01 07:48:31","updated_at":"2019-11-01 07:48:31"},{"id":1,"location":"Hiroshima","winning_robot":{"id":1,"name":"Terminal","weight":"90.32","power":"2.00","speed":"3.00"},"defeated_robot":{"id":2,"name":"Postman","weight":"4.00","power":"5.00","speed":"6.00"},"created_at":"2019-11-01 07:44:55","updated_at":"2019-11-01 07:44:55"}]}` |
 | GET | /api/battle/leaderboard | Get the robot ranking | limit: integer, optional<br>page: integer, optional | 422: Input Validation Error<br>409: Unexpected Error<br>200: Success | `{"data":[{"robot_id":1,"name":"Terminal","battle_count":3,"winning_count":2,"losing_count":1},{"robot_id":4,"name":"Slack","battle_count":1,"winning_count":1,"losing_count":0},{"robot_id":2,"name":"Postman","battle_count":1,"winning_count":0,"losing_count":1},{"robot_id":3,"name":"Paw","battle_count":1,"winning_count":0,"losing_count":1}]}` |
+
+# Testing
+
+You can run the test cases by:
+
+    ./vendor/bin/phpunit 
