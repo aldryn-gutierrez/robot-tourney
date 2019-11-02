@@ -5,7 +5,6 @@ namespace App\Repositories;
 use App\Models\Challenger;
 use App\Repositories\Criteria\BetweenCriteria;
 use App\Repositories\Criteria\GenericCriteria;
-use DB;
 
 class ChallengerRepository extends BaseRepository
 {
@@ -32,24 +31,5 @@ class ChallengerRepository extends BaseRepository
         }
 
         return $this->count();
-    }
-
-    public function getLeaderboard($page, $limit)
-    {
-        return DB::table($this->tableName.' as c')
-            ->select(
-                DB::raw('
-                    c.robot_id,
-                    r.name,
-                    COUNT(c.battle_id) AS battle_count,
-                    COUNT(CASE WHEN c.is_victorious = 1 THEN 1 END) as winning_count,
-                    COUNT(CASE WHEN c.is_victorious = 0 THEN 1 END) as losing_count
-                ')
-            )
-            ->leftJoin('robots as r', 'r.id', '=', 'c.robot_id')
-            ->groupBy('c.robot_id', 'r.name')
-            ->orderByRaw("`battle_count` DESC, `winning_count` DESC, `losing_count` DESC")
-            ->simplePaginate($limit, ['*'], 'page', $page)
-            ->items();
     }
 }

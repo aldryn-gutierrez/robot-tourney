@@ -64,7 +64,7 @@ class AuthController extends ApiController
 
         try {
             if (!$token = Auth::attempt($credentials)) {
-                return $this->respondWithArray(['message' => 'Unauthorized'], [], 401);
+                return $this->respondWithError("Unauthorized", 401);
             }
         } catch (\Exception $exception) {
             Log::error('Login encountered an unexpected error', [

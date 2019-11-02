@@ -4,11 +4,12 @@ namespace Tests;
 
 use Laravel\Lumen\Testing\TestCase as LumenTestCase;
 use Laravel\Lumen\Testing\DatabaseMigrations;
+use Laravel\Lumen\Testing\DatabaseTransactions;
 use Laravel\Lumen\Testing\WithoutMiddleware;
 
 abstract class TestCase extends LumenTestCase
 {
-    use DatabaseMigrations, WithoutMiddleware;
+    use DatabaseMigrations, DatabaseTransactions, WithoutMiddleware;
 
     /**
      * Creates the application.

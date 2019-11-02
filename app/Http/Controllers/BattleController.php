@@ -167,11 +167,11 @@ class BattleController extends ApiController
      *
      * @param  \Illuminate\Http\Request $request
      * @param  \App\Repositories\BattleRepository $battleRepository
-     * @param  \App\Repositories\ChallengerRepository $challengerRepository
+     * @param  \App\Repositories\RobotRepository $robotRepository
      *
      * @return \Illuminate\Http\Response
      */
-    public function leaderboard(Request $request, BattleRepository $battleRepository, ChallengerRepository $challengerRepository)
+    public function leaderboard(Request $request, BattleRepository $battleRepository, RobotRepository $robotRepository)
     {
         $this->validate($request, [
             'limit' => 'nullable|integer|min:1|max:'.env('PAGINATION_LIMIT'),
@@ -189,7 +189,8 @@ class BattleController extends ApiController
         }
 
         try {
-            $leaderboard = $challengerRepository->getLeaderboard($page, $limit);
+            $leaderboard = $robotRepository->getLeaderboard($page, $limit);
+            $leaderboard = array_map(function($element){ return (array) $element; }, $leaderboard);
         } catch (Exception $exception) {
             Log::error('Battle Results encountered an unexpected error', [
                 'line' => $exception->getLine(),
