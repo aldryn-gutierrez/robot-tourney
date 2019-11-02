@@ -14,6 +14,17 @@ class Robot extends Model
     protected $table = 'robots';
 
     /**
+     * The attributes that should be cast to native types.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'speed' => 'float',
+        'weight' => 'float',
+        'power' => 'float',
+    ];
+
+    /**
      * The users that belong to the robot.
      */
     public function users()
